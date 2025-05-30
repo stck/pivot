@@ -347,6 +347,103 @@ topSuite("Ext.pivot.plugin.Exporter", ['Ext.pivot.Grid', 'Ext.exporter.*'], func
             });
         });
 
-    });
+        describe('verify exporter for foreign characters', function() {
+            it('should encode format (Euro Currency)', function() {
+                var styleSheet;
 
+                makeCmp({
+                    type: 'xlsx'
+                }, {
+                    matrix: {
+                        aggregate: [{
+                            id: 'agg',
+                            dataIndex: 'value',
+                            header: 'Sum of value',
+                            aggregator: 'sum',
+                            width: 90,
+                            exportStyle: [{
+                                // Euro Currency cell format
+                                format: 'Euro Currency',
+                                font: {
+                                    italic: true
+                                }
+                            }, {
+                                type: 'html',
+                                alignment: {
+                                    horizontal: 'Right'
+                                }
+                            }]
+                        }]
+                    },
+                    listeners: {
+                        documentsave: function(cmp, params) {
+                            styleSheet = params.exporter.excel.getWorkbook().getStylesheet().render();
+                        }
+                    }
+                });
+
+                waitsFor(function() {
+                    return ready;
+                });
+
+                runs(function() {
+                    expect(styleSheet).toContain(Ext.util.Base64._utf8_encode("€"));
+                });
+            });
+
+            it('should format title having special characters', function() {
+                var title = 'Special Characters & < >',
+                    encodedTitle = Ext.util.Base64._utf8_encode(Ext.String.htmlEncode(title) || ''),
+                    coreProperties, sheetName;
+
+                makeCmp({
+                    type: 'xlsx',
+                    title: title
+                }, {
+                    listeners: {
+                        documentsave: function(cmp, params) {
+                            coreProperties = params.exporter.excel.getProperties().render();
+                            sheetName = params.exporter.excel.getWorkbook().getSheets().getAt(0).getName();
+                        }
+                    }
+                });
+
+                waitsFor(function() {
+                    return ready;
+                });
+
+                runs(function() {
+                    expect(coreProperties).not.toContain(title);
+                    expect(coreProperties).toContain(encodedTitle);
+                });
+            });
+
+            it('should format title with more than 32 characters and special characters', function() {
+                var title = 'Special Characters & < > and More than 32 characters',
+                    encodedTitle = Ext.util.Base64._utf8_encode(Ext.String.htmlEncode(title) || ''),
+                    coreProperties, sheetName;
+
+                makeCmp({
+                    type: 'xlsx',
+                    title: title
+                }, {
+                    listeners: {
+                        documentsave: function(cmp, params) {
+                            coreProperties = params.exporter.excel.getProperties().render();
+                            sheetName = params.exporter.excel.getWorkbook().getSheets().getAt(0).getName();
+                        }
+                    }
+                });
+
+                waitsFor(function() {
+                    return ready;
+                });
+
+                runs(function() {
+                    expect(coreProperties).not.toContain(title);
+                    expect(coreProperties).toContain(encodedTitle);
+                });
+            });
+        });
+    });
 });

@@ -4,42 +4,6 @@
 .#{$prefix}rtl.#{$prefix}column-header-last {
     border-left: $grid-header-trigger-border;
 }
-
-@if $ext-pivot-trial {
-    @font-face {
-        font-family: 'ext-watermark';
-        src:url('#{$pivot-font-path}/ext-watermark.eot?n6lnws');
-        src:url('#{$pivot-font-path}/ext-watermark.eot?#iefixn6lnws') format('embedded-opentype'),
-        url('#{$pivot-font-path}/ext-watermark.woff?n6lnws') format('woff'),
-        url('#{$pivot-font-path}/ext-watermark.ttf?n6lnws') format('truetype'),
-        url('#{$pivot-font-path}/ext-watermark.svg?n6lnws#ext-watermark') format('svg');
-        font-weight: normal;
-        font-style: normal;
-    }
-    .#{$prefix}pivot-grid{
-        .#{$prefix}title-text {
-            &:after {
-                font-family: ext-watermark;
-                font-size: ($panel-header-line-height + vertical($panel-header-padding)) * 0.75;
-                content: 'd';
-                position: absolute;
-                top: 0;
-                right: 0;
-                // since IE8 does not support opacity on pseudo elements we simulate it by
-                // mixing the text color with the background color
-                color: mix($panel-header-color, $panel-header-background-color, 40%);
-            }
-
-            @if $include-rtl {
-                &.#{$prefix}rtl:after {
-                    right: auto;
-                    left: 0;
-                }
-            }
-        }
-    }
-}
-
 // Common classes
 
 .#{$prefix}pivot-grid{
